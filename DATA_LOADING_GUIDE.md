@@ -62,6 +62,8 @@ python generate_bulk_data.py
 
 ### Step 2: Load Data into MySQL
 
+**IMPORTANT:** The bulk data file automatically clears existing data to prevent duplicate key errors.
+
 Execute the generated SQL file:
 
 ```bash
@@ -74,6 +76,20 @@ Or from within MySQL:
 USE healthcare_system;
 SOURCE healthcare_bulk_data.sql;
 ```
+
+**What happens during load:**
+1. ✅ Temporarily disables foreign key checks
+2. ✅ Truncates all tables (except departments)
+3. ✅ Inserts fresh bulk data (50 doctors, 200 patients, etc.)
+4. ✅ Populates denormalized table via INSERT...SELECT
+5. ✅ Re-enables foreign key checks
+
+**Data preserved:**
+- Departments table (keeps existing 10 records)
+
+**Data replaced:**
+- Doctors, Patients, Diagnoses, Medications
+- Encounters and Denormalized encounters
 
 ### Step 3: Verify Data Loaded
 
@@ -249,6 +265,31 @@ encounter_date = random_date(2023, 2024)  # Change year range
 
 ## Troubleshooting
 
+### Issue: Duplicate Entry Error (icd_code, medication_name, etc.)
+**Error Messages:**
+```
+Error: Duplicate entry 'I10' for key 'diagnoses.icd_code'
+Error: Duplicate entry 'Lisinopril' for key 'medications.medication_name'
+```
+
+**Root Cause:** Tables already contain data from previous runs with UNIQUE constraints
+
+**Solution:** ✅ **FIXED** - The script now automatically truncates tables before loading
+- Lines 14-43 in `healthcare_bulk_data.sql` handle cleanup
+- If you still get this error, ensure you're using the latest version
+
+**Manual Fix (if needed):**
+```sql
+SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE TABLE denormalized_patient_encounters;
+TRUNCATE TABLE encounters;
+TRUNCATE TABLE doctors;
+TRUNCATE TABLE patients;
+TRUNCATE TABLE diagnoses;
+TRUNCATE TABLE medications;
+SET FOREIGN_KEY_CHECKS = 1;
+```
+
 ### Issue: Foreign Key Constraint Fails
 **Solution:** Ensure dimension tables are populated before encounters
 ```sql
@@ -257,11 +298,11 @@ SELECT COUNT(*) FROM doctors;
 SELECT COUNT(*) FROM patients;
 ```
 
-### Issue: Duplicate Key Error
-**Solution:** Truncate tables before reloading
-```sql
-TRUNCATE TABLE denormalized_patient_encounters;
-TRUNCATE TABLE encounters;
+### Issue: Duplicate Key Error (Still Occurring)
+**Solution:** The script now handles this automatically with TRUNCATE statements
+If issue persists, regenerate the SQL file:
+```bash
+python generate_bulk_data.py
 ```
 
 ### Issue: Unicode Encoding Error (Python)

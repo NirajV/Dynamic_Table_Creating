@@ -338,7 +338,37 @@ def main():
         f.write("-- ============================================================================\n\n")
         f.write("USE healthcare_system;\n\n")
 
-        f.write("-- Note: Departments table already populated with 10 records\n\n")
+        # Add cleanup section
+        f.write("-- ============================================================================\n")
+        f.write("-- DATA CLEANUP - Remove existing data to prevent duplicates\n")
+        f.write("-- ============================================================================\n")
+        f.write("-- This prevents \"Duplicate entry\" errors for UNIQUE constraints\n")
+        f.write("-- We clear dependent tables first (in reverse FK order), then parent tables\n\n")
+
+        f.write("SET FOREIGN_KEY_CHECKS = 0;\n\n")
+
+        f.write("-- Clear denormalized table first (depends on all others)\n")
+        f.write("TRUNCATE TABLE denormalized_patient_encounters;\n\n")
+
+        f.write("-- Clear encounters table (depends on dimension tables)\n")
+        f.write("TRUNCATE TABLE encounters;\n\n")
+
+        f.write("-- Clear dimension tables (doctors depends on departments, so clear doctors first)\n")
+        f.write("TRUNCATE TABLE doctors;\n")
+        f.write("TRUNCATE TABLE patients;\n")
+        f.write("TRUNCATE TABLE diagnoses;\n")
+        f.write("TRUNCATE TABLE medications;\n\n")
+
+        f.write("-- Keep departments table as-is (already has 10 records)\n")
+        f.write("-- If you want fresh departments too, uncomment the next line:\n")
+        f.write("-- TRUNCATE TABLE departments;\n\n")
+
+        f.write("SET FOREIGN_KEY_CHECKS = 1;\n\n")
+
+        f.write("-- ============================================================================\n")
+        f.write("-- Note: All tables are now empty (except departments with 10 records)\n")
+        f.write("-- Ready for bulk data insertion\n")
+        f.write("-- ============================================================================\n\n")
 
         print("Generating doctors data...")
         f.write(generate_doctors_sql())

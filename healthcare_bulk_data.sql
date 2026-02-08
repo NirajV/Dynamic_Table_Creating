@@ -11,7 +11,36 @@
 
 USE healthcare_system;
 
--- Note: Departments table already populated with 10 records
+-- ============================================================================
+-- DATA CLEANUP - Remove existing data to prevent duplicates
+-- ============================================================================
+-- This prevents "Duplicate entry" errors for UNIQUE constraints
+-- We clear dependent tables first (in reverse FK order), then parent tables
+
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- Clear denormalized table first (depends on all others)
+TRUNCATE TABLE denormalized_patient_encounters;
+
+-- Clear encounters table (depends on dimension tables)
+TRUNCATE TABLE encounters;
+
+-- Clear dimension tables (doctors depends on departments, so clear doctors first)
+TRUNCATE TABLE doctors;
+TRUNCATE TABLE patients;
+TRUNCATE TABLE diagnoses;
+TRUNCATE TABLE medications;
+
+-- Keep departments table as-is (already has 10 records)
+-- If you want fresh departments too, uncomment the next line:
+-- TRUNCATE TABLE departments;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- ============================================================================
+-- Note: All tables are now empty (except departments with 10 records)
+-- Ready for bulk data insertion
+-- ============================================================================
 
 -- ============================================================================
 -- INSERT DOCTORS (50 records)
