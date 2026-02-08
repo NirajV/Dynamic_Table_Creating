@@ -1,0 +1,3 @@
+Prompts :- 
+
+I need to create fake table a denormatilized table wich has around 30 - 40 Attributed in the same subject Area. When I create this table it should have PF-FK relation ship .. Please give me the plan
