@@ -1,3 +1,12 @@
-Prompts :- 
+Prompts :- 1
 
 I need to create fake table a denormatilized table wich has around 30 - 40 Attributed in the same subject Area. When I create this table it should have PF-FK relation ship .. Please give me the plan
+
+---------------------------------------------------------------------------
+
+Prompts :- 2
+
+Create the DDL and DML based on this Healthcare Patient Records
+
+Main table: denormalized_patient_encounters
+Related dimensions: patients, doctors, departments, diagnoses, medications Read plan-denormalizedTableCreation.prompt.md
