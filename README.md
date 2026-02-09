@@ -53,8 +53,14 @@ The system manages patient encounters across multiple departments with:
 ### Database Design
 - ✅ **5 Dimension Tables:** patients, doctors, departments, diagnoses, medications
 - ✅ **1 Denormalized Table:** Complete encounter records (68 columns)
+- ✅ **1 Normalized Database:** 6 tables in Third Normal Form (3NF) extracted from denormalized data
 - ✅ **PK-FK Relationships:** Proper referential integrity with ON DELETE rules
 - ✅ **Indexes:** Optimized for common query patterns
+
+### Data Normalization
+- ✅ **SQL Normalization Script:** Extracts normalized tables from denormalized data using `ROW_NUMBER()`
+- ✅ **Python Setup Script:** Automated database creation with MySQL auto-detection and verification
+- ✅ **6 Normalized Tables:** departments, doctors, patients, diagnoses, medications, encounters
 
 ### Data Generation
 - ✅ **Python Script:** Automated fake data generation using Faker
@@ -66,7 +72,6 @@ The system manages patient encounters across multiple departments with:
 - ✅ **Implementation Guide:** 600+ lines explaining denormalization
 - ✅ **Data Loading Guide:** Step-by-step loading instructions
 - ✅ **Analysis Queries:** 15 pre-built queries for common reports
-- ✅ **Architecture Diagrams:** Visual data flow explanations
 
 ---
 
@@ -77,6 +82,7 @@ Dynamic_Table_Creating/
 │
 ├── 📄 README.md                              # This file
 ├── 📄 HandMake_Prompts.txt                   # Original requirements
+├── 📄 .gitignore                             # Git ignore rules
 │
 ├── 🗄️  Database Schema (DDL)
 │   └── healthcare_ddl.sql                    # Table definitions
@@ -85,6 +91,10 @@ Dynamic_Table_Creating/
 │   ├── healthcare_dml.sql                    # Initial 15 records
 │   ├── healthcare_insert_select.sql          # Alternative loading method
 │   └── healthcare_bulk_data.sql              # 800+ records (generated)
+│
+├── 🔄 Data Normalization
+│   ├── normalize_healthcare.sql              # SQL script to extract normalized tables
+│   └── setup_normalized_db.py               # Python setup script (auto-detect MySQL)
 │
 ├── 🐍 Data Generation
 │   └── generate_bulk_data.py                 # Python script to generate data
@@ -168,7 +178,30 @@ mysql -u root -p healthcare_system < healthcare_bulk_data.sql
 - Inserts 500 encounters
 - Populates denormalized table
 
-### Step 4: Verify Data
+### Step 4: Create Normalized Database (Optional)
+
+```bash
+python setup_normalized_db.py
+```
+
+Or with CLI arguments:
+
+```bash
+python setup_normalized_db.py root yourpassword
+```
+
+This reads `healthcare_system.denormalized_patient_encounters` and creates `healthcare_system_model_db` with 6 normalized tables:
+
+| Table | Records | Extracted By |
+|-------|---------|-------------|
+| departments | 10 | Unique department_name |
+| doctors | 50 | Unique license_number |
+| patients | 177 | Unique fk_patient_id |
+| diagnoses | 20 | Unique ICD code |
+| medications | 30 | Unique medication_name |
+| encounters | 500 | All records (fact table) |
+
+### Step 5: Verify Data
 
 ```bash
 mysql -u root -p healthcare_system
@@ -557,12 +590,14 @@ Current indexes on `denormalized_patient_encounters`:
 ### Key Concepts Demonstrated
 
 - ✅ Database denormalization patterns
+- ✅ Data normalization from denormalized source using ROW_NUMBER()
 - ✅ Primary Key and Foreign Key relationships
 - ✅ Data generation with Python Faker
 - ✅ SQL DDL (Data Definition Language)
 - ✅ SQL DML (Data Manipulation Language)
 - ✅ INSERT...SELECT statements
 - ✅ LEFT JOIN operations
+- ✅ Window functions (ROW_NUMBER, PARTITION BY)
 - ✅ Aggregate functions and GROUP BY
 - ✅ Database indexing strategies
 - ✅ Trade-offs in database design
@@ -571,6 +606,7 @@ Current indexes on `denormalized_patient_encounters`:
 
 - **Implementation Guide:** `healthcare_implementation_guide.sql` (600+ lines)
 - **Data Loading Guide:** `DATA_LOADING_GUIDE.md`
+- **Normalization Script:** `normalize_healthcare.sql`
 - **Planning Document:** `.github/prompts/plan-denormalizedTableCreation.prompt.md`
 
 ---
@@ -654,6 +690,7 @@ If you encounter issues or have questions:
 This project was created to demonstrate:
 
 ✅ Real-world database denormalization patterns
+✅ Reverse normalization from denormalized data
 ✅ Trade-offs between normalization and performance
 ✅ Practical use of Primary Key and Foreign Key relationships
 ✅ Bulk data generation techniques
@@ -665,12 +702,13 @@ This project was created to demonstrate:
 
 ## 📈 Project Stats
 
-- **Total Files:** 10+ SQL and Python files
-- **Total Lines of Code:** 3,500+
+- **Total Files:** 12+ SQL and Python files
+- **Total Lines of Code:** 4,000+
 - **Total Records Generated:** 800+
 - **Documentation Lines:** 1,500+
 - **Analysis Queries:** 15
-- **Database Tables:** 7
+- **Databases:** 2 (denormalized + normalized)
+- **Database Tables:** 13 (7 denormalized + 6 normalized)
 
 ---
 
