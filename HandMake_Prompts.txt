@@ -10,3 +10,34 @@ Create the DDL and DML based on this Healthcare Patient Records
 
 Main table: denormalized_patient_encounters
 Related dimensions: patients, doctors, departments, diagnoses, medications Read plan-denormalizedTableCreation.prompt.md
+
+---------------------------------------------------------------------------------------------------
+
+Prompts :- 3
+
+ Add fake data into all the source table around 500 records and finally insert into the denormalized_patient_encounters
+
+ --------------------------------------------------------------------------------------------------------
+
+ Prompts   :- 4
+
+ ❯ Fix this Issue Error: Duplicate entry 'I10' for key 'diagnoses.icd_code' and Error: Duplicate entry 'Lisinopril' for key 'medications.medication_name' eliminate all duplicate data issue based on the
+  healthcare_bulk_data.sql
+
+  ---------------------------------------------------------------
+
+  Prompts :- 5
+
+  create the readme
+
+  ------------------------------------------------------------------------
+Prompts :- 6
+DROP DATABASE IF EXISTS healthcare_system_model_db;
+
+CREATE DATABASE healthcare_system_model_db;
+
+USE healthcare_system_model_db
+Now I read this  healthcare_system.denormalized_patient_encounters and create a individaul table based on the subject area and
+Load unique data from the healthcare_system.denormalized_patient_encounters
+
+Create Database set script in python and Data normalization sripts in sql and call this scipts in python
